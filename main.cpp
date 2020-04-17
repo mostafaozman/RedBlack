@@ -191,7 +191,11 @@ void visualPrint(tree* root, int space)
     {
         cout << " ";
     }
-    
+    // If head exists make it black
+    if(head != NULL)
+    {
+        head ->  setColor(false);
+    }
     if(root -> getColor() == true && root -> getData() != 0)
     {
         cout << root -> getData() << " RED" << "\n";
@@ -207,12 +211,13 @@ void visualPrint(tree* root, int space)
 
 void print(tree* root)
 {
+    
     visualPrint(root, 0);
 }
 
 void buildTree(int value, tree* current)
 {
-    // If the tree does not exist yet, insert node and make it red
+    // If the tree does not exist yet, insert node and make it black
     if(head == NULL)
     {
         tree* t = new tree(value);
@@ -225,7 +230,7 @@ void buildTree(int value, tree* current)
         // If the value is larger than the previous node
         if(value > current -> getData())
         {
-            if(current -> getRight() == NULL)
+            if(current -> getRight() == NULL || current -> getRight() -> getData() == 0)
             {
                 tree* right = new tree(value);
                 current -> setRight(right);
@@ -246,7 +251,7 @@ void buildTree(int value, tree* current)
         // If the value is less than, set as left
         else if(value < current -> getData())
         {
-            if(current -> getLeft() == NULL)
+            if(current -> getLeft() == NULL || current -> getLeft() -> getData() == 0)
             {
                 tree* left = new tree(value);
                 current -> setLeft(left);
@@ -290,13 +295,13 @@ tree* getUncle(tree* current)
     {
         return NULL;
     }
-    if(current->getParent()->getRight() != current)
+    if(current->getParent()->getRight() == current && current -> getParent() -> getParent() !=NULL)
     {
-        return current->getParent()->getRight();
+        return current->getParent()-> getParent() ->getLeft();
     }
-    if(current->getParent()->getLeft() != current)
+    if(current->getParent()->getLeft() == current && current -> getParent() -> getParent() !=NULL)
     {
-        return current->getParent()->getLeft();
+        return current->getParent()-> getParent() -> getRight();
     }
     else
     {
@@ -347,7 +352,9 @@ void rotateParent(tree* root, tree* current)
                 temp ->setLeft(current->getParent()->getLeft());
                 temp -> setRight(current->getLeft());
                 
+                current ->setParent(getGrandParent(current));
                 getGrandParent(current) -> setLeft(current);
+                temp -> setParent(current);
                 current -> setLeft(temp);
             }
             // If the node so to the left of that parent and the parent is to the right of the grandparent
@@ -357,7 +364,9 @@ void rotateParent(tree* root, tree* current)
                 temp ->setRight(current->getParent()->getRight());
                 temp -> setLeft(current->getRight());
                 
+                current ->setParent(getGrandParent(current));
                 getGrandParent(current) -> setRight(current);
+                temp -> setParent(current);
                 current -> setRight(temp);
             }
         }
@@ -396,12 +405,14 @@ void rotateFull2(tree* root, tree* current)
     // if the parent is to the right of the granparent and the node is to the right of the parent
     if(current -> getParent() -> getRight() == current && getGrandParent(current) -> getRight() == current -> getParent())
     {
+        temp -> setColor(getGrandParent(current) -> getColor());
         temp->setData(getGrandParent(current) -> getData());
         temp -> setRight(current -> getParent() -> getLeft());
         temp -> setLeft(NULL);
         
         if(getUncle(current) != NULL)
         {
+            temp2 -> setColor(getUncle(current) -> getColor());
             temp2->setData(getUncle(current) -> getData());
             temp2 -> setRight(getUncle(current) -> getRight());
             temp2 -> setLeft(getUncle(current) -> getLeft());
@@ -416,18 +427,23 @@ void rotateFull2(tree* root, tree* current)
         
         if(getGrandParent(current) -> getParent() == NULL)
         {
+            head = current->getParent();
+            temp -> setParent(current->getParent());
             current -> getParent() -> setLeft(temp);
+            temp2 -> setParent(temp);
             current -> getParent() -> getLeft() -> setLeft(temp2);
             current -> getParent() -> toggle();
             current -> getParent() -> getLeft() -> toggle();
-            head = current->getParent();
             return;
         }
         
         if(getGrandParent(current) -> getParent() -> getLeft() == getGrandParent(current))
         {
+            current -> getParent() -> setParent(getGrandParent(current) -> getParent());
             getGrandParent(current) -> getParent() -> setLeft(current->getParent());
+            temp -> setParent(current->getParent());
             current -> getParent() -> setLeft(temp);
+            temp2 -> setParent(temp);
             current -> getParent() -> getLeft() -> setLeft(temp2);
             current -> getParent() -> toggle();
             current -> getParent() -> getLeft() -> toggle();
@@ -436,8 +452,11 @@ void rotateFull2(tree* root, tree* current)
         
         if(getGrandParent(current) -> getParent() -> getRight() == getGrandParent(current))
         {
+            current -> getParent() -> setParent(getGrandParent(current) -> getParent());
             getGrandParent(current) -> getParent() -> setRight(current->getParent());
+            temp -> setParent(current->getParent());
             current -> getParent() -> setLeft(temp);
+            temp2 -> setParent(temp);
             current -> getParent() -> getLeft() -> setLeft(temp2);
             current -> getParent() -> toggle();
             current -> getParent() -> getLeft() -> toggle();
@@ -448,12 +467,14 @@ void rotateFull2(tree* root, tree* current)
     // If the node is to the left of that parent and the parent is to the left of the grandparent
     if(current -> getParent() -> getLeft() == current && getGrandParent(current) -> getLeft() == current -> getParent())
     {
+        temp -> setColor(getGrandParent(current) -> getColor());
         temp-> setData(getGrandParent(current) -> getData());
         temp -> setLeft(current -> getParent() -> getRight());
         temp -> setRight(NULL);
         
         if(getUncle(current) != NULL)
         {
+            temp2 ->setColor(getUncle(current) -> getColor());
             temp2 -> setData(getUncle(current) -> getData());
             temp2 -> setRight(getUncle(current) -> getRight());
             temp2 -> setLeft(getUncle(current) -> getLeft());
@@ -468,18 +489,23 @@ void rotateFull2(tree* root, tree* current)
         
         if(getGrandParent(current) -> getParent() == NULL)
         {
+            head = current->getParent();
+            temp -> setParent(current->getParent());
             current -> getParent() -> setRight(temp);
+            temp2 -> setParent(temp);
             current -> getParent() -> getRight() -> setRight(temp2);
             current -> getParent() -> toggle();
-            current -> getParent() -> getLeft() -> toggle();
-            head = current->getParent();
+            current -> getParent() -> getRight() -> toggle();
             return;
         }
         
         if(getGrandParent(current) -> getParent() -> getLeft() == getGrandParent(current))
         {
+            current -> getParent() -> setParent(getGrandParent(current) -> getParent());
             getGrandParent(current) -> getParent() -> setLeft(current->getParent());
+            temp -> setParent(current->getParent());
             current -> getParent() -> setRight(temp);
+            temp2 -> setParent(temp);
             current -> getParent() -> getRight() -> setRight(temp2);
             current -> getParent() -> toggle();
             current -> getParent() -> getLeft() -> toggle();
@@ -488,8 +514,11 @@ void rotateFull2(tree* root, tree* current)
         
         if(getGrandParent(current) -> getParent() -> getRight() == getGrandParent(current))
         {
+            current -> getParent() -> setParent(getGrandParent(current) -> getParent());
             getGrandParent(current) -> getParent() -> setRight(current->getParent());
+            temp -> setParent(current->getParent());
             current -> getParent() -> setRight(temp);
+            temp2 -> setParent(temp);
             current -> getParent() -> getRight() -> setRight(temp2);
             current -> getParent() -> toggle();
             current -> getParent() -> getLeft() -> toggle();
