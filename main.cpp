@@ -546,7 +546,7 @@ void rotateFull2(tree* root, tree* current)
             temp -> setParent(current->getParent());
             current -> getParent() -> setRight(temp);
             current -> getParent() -> toggle();
-            current -> getParent() -> getLeft() -> toggle();
+            current -> getParent() -> getRight() -> toggle();
             return;
         }
         
