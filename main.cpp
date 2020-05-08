@@ -22,6 +22,13 @@ bool parentRed(tree* root, tree* current);
 bool rotateParent(tree* root, tree* current);
 bool rotateFull(tree* root, tree* current);
 void rotateFull2(tree* root, tree* current);
+tree* search(tree* current, int value);
+tree* findNext(tree* current);
+void del(tree* current, int value);
+void delMethod(tree* current, int value);
+tree* getSibling(tree* current);
+void case4(tree* current);
+void case6(tree* current);
 
 int heap[100];
 int size;
@@ -144,7 +151,7 @@ int main()
     
     while (yes == true)
     {
-        cout << "\nWhat would you like to  do? Add (1) or  Print (2)"<< endl;
+        cout << "\nWhat would you like to  do? Add (1), Print (2), Search (3), Delete (4), or Quit (5)"<< endl;
         cin >> type;
         cin.clear();
         cin.ignore(10000, '\n');
@@ -161,6 +168,40 @@ int main()
         if (type == 2)
         {
             print(head);
+        }
+        
+        if (type == 3)
+        {
+            int s;
+            cout << "\nWhat number would you like to search for?" << endl;
+            cin >> s;
+            cin.clear();
+            cin.ignore(10000, '\n');
+            if(search(head, s) != NULL)
+            {
+                cout << "\nFound!" << endl;
+            }
+            else
+            {
+                cout << "\nNot Found :(" << endl;
+            }
+        }
+        
+        if (type == 4)
+        {
+            int d;
+            cout << "\nWhat number would you like to delete?" << endl;
+            cin >> d;
+            cin.clear();
+            cin.ignore(10000, '\n');
+            tree* n = search(head, d);
+            delMethod(n, d);
+            print(head);
+        }
+        
+        if (type == 5)
+        {
+            break;
         }
         
         else
@@ -224,72 +265,78 @@ void buildTree(int value, tree* current)
         tree* t = new tree(value);
         head = t;
         head ->  setColor(false);
+        
+        tree* five = new tree(5);
+        five -> setColor(false);
+        tree* thirty = new tree(30);
+        thirty -> setColor(false);
+        tree* fourty = new tree(40);
+        fourty -> setColor(true);
+        tree* twentyfive = new tree(25);
+        twentyfive -> setColor(true);
+        
+        thirty -> setLeft(twentyfive);
+        twentyfive -> setParent(thirty);
+        thirty -> setRight(fourty);
+        fourty -> setParent(thirty);
+        head -> setRight(thirty);
+        thirty -> setParent(head);
+        head -> setLeft(five);
+        five -> setParent(head);
     }
-    
-    else // if the tree exists
-    {
-        // If the value is larger than the previous node
-        if(value > current -> getData())
-        {
-            if(current -> getRight() == NULL || current -> getRight() -> getData() == 0)
-            {
-                tree* right = new tree(value);
-                current -> setRight(right);
-                right -> setParent(current);
-                current2 = right;
-                /*
-                 // Case 5
-                 rotateFull(head, right);
-                 // Case 4
-                 rotateParent(head, right);
-                 // Case 3
-                 parentRed(head, right);
-                 */
-                while (rotateParent(head, current2) == true || rotateFull(head, current2) == true || parentRed(head, current2) == true)
-                {
-                    print(head);
-                }
-                print(head);
-            }
-            else
-            {
-                buildTree(value, current-> getRight());
-            }
-        }
-        // If the value is less than, set as left
-        else if(value < current -> getData())
-        {
-            if(current -> getLeft() == NULL || current -> getLeft() -> getData() == 0)
-            {
-                tree* left = new tree(value);
-                current -> setLeft(left);
-                left -> setParent(current);
-                current2 = left;
-                /*
-                 // Case 5
-                 rotateFull(head, left);
-                 // Case 4
-                 rotateParent(head, left);
-                 // Case 3
-                 parentRed(head, left);
-                 */
-                while (rotateParent(head, current2) == true || rotateFull(head, current2) == true || parentRed(head, current2) == true)
-                {
-                    print(head);
-                }
-                print(head);
-                
-            }
-            else
-            {
-                buildTree(value, current-> getLeft());
-            }
-        }
-        else // the value is duplicate
-        {
-            
-        }
-    }
+    /*
+     
+     else // if the tree exists
+     {
+     // If the value is larger than the previous node
+     if(value > current -> getData())
+     {
+     if(current -> getRight() == NULL || current -> getRight() -> getData() == 0)
+     {
+     tree* right = new tree(value);
+     current -> setRight(right);
+     right -> setParent(current);
+     current2 = right;
+     
+     while (rotateParent(head, current2) == true || rotateFull(head, current2) == true || parentRed(head, current2) == true)
+     {
+     print(head);
+     }
+     print(head);
+     }
+     else
+     {
+     buildTree(value, current-> getRight());
+     }
+     }
+     // If the value is less than, set as left
+     else if(value < current -> getData())
+     {
+     if(current -> getLeft() == NULL || current -> getLeft() -> getData() == 0)
+     {
+     tree* left = new tree(value);
+     current -> setLeft(left);
+     left -> setParent(current);
+     current2 = left;
+     
+     while (rotateParent(head, current2) == true || rotateFull(head, current2) == true || parentRed(head, current2) == true)
+     {
+     print(head);
+     }
+     print(head);
+     
+     }
+     else
+     {
+     buildTree(value, current-> getLeft());
+     }
+     }
+     else // the value is duplicate
+     {
+     
+     }
+     }
+     */
 }
 
 tree* getGrandParent(tree* current)
@@ -475,6 +522,7 @@ void rotateFull2(tree* root, tree* current)
     {
         temp -> setColor(getGrandParent(current) -> getColor());
         temp->setData(getGrandParent(current) -> getData());
+        current -> getParent() -> getLeft() -> setParent(temp);
         temp -> setRight(current -> getParent() -> getLeft());
         temp -> setLeft(getUncle(current));
         
@@ -491,6 +539,7 @@ void rotateFull2(tree* root, tree* current)
             current -> getParent() -> setLeft(temp);
             current -> getParent() -> toggle();
             current -> getParent() -> getLeft() -> toggle();
+            print(head);
             return;
         }
         
@@ -502,6 +551,7 @@ void rotateFull2(tree* root, tree* current)
             current -> getParent() -> setLeft(temp);
             current -> getParent() -> toggle();
             current -> getParent() -> getLeft() -> toggle();
+            print(head);
             return;
         }
         
@@ -513,6 +563,7 @@ void rotateFull2(tree* root, tree* current)
             current -> getParent() -> setLeft(temp);
             current -> getParent() -> toggle();
             current -> getParent() -> getLeft() -> toggle();
+            print(head);
             return;
         }
         
@@ -536,6 +587,7 @@ void rotateFull2(tree* root, tree* current)
             current -> getParent() -> setRight(temp);
             current -> getParent() -> toggle();
             current -> getParent() -> getRight() -> toggle();
+            print(head);
             return;
         }
         
@@ -547,6 +599,7 @@ void rotateFull2(tree* root, tree* current)
             current -> getParent() -> setRight(temp);
             current -> getParent() -> toggle();
             current -> getParent() -> getRight() -> toggle();
+            print(head);
             return;
         }
         
@@ -558,7 +611,382 @@ void rotateFull2(tree* root, tree* current)
             current -> getParent() -> setRight(temp);
             current -> getParent() -> toggle();
             current -> getParent() -> getRight() -> toggle();
+            print(head);
             return;
+        }
+    }
+}
+
+tree* search (tree* current, int value)
+{
+    if (value == current->getData())
+    {
+        return current;
+    }
+    
+    if (current -> getLeft()== NULL && current -> getRight() == NULL)
+    {
+        return NULL;
+    }
+    
+    else if (value > current->getData())
+    {
+        if(current->getRight() == NULL)
+        {
+            return NULL;
+        }
+        else
+        {
+            if( current -> getRight() != NULL)
+            {
+                return search(current->getRight(), value);
+            }
+        }
+    }
+    else if (value < current -> getData())
+    {
+        if (current-> getLeft() == NULL)
+        {
+            return NULL;
+        }
+        else
+        {
+            if(current ->getLeft() != NULL)
+            {
+                return search(current->getLeft(), value);
+            }
+        }
+    }
+    
+    
+    return NULL;
+}
+
+tree* findNext(tree* current)
+{
+    // go right once then left all the way
+    if(current == NULL || current->getRight() == NULL)
+    {
+        
+    }
+    else
+    {
+        current = current -> getRight();
+        
+        while(current->getLeft() != NULL)
+        {
+            current = current->getLeft();
+        }
+    }
+    return current;
+}
+
+tree* getSibling(tree* current)
+{
+    // If then node is on the right side
+    if(current -> getParent() -> getRight() == current)
+    {
+        return current -> getParent() -> getLeft();
+    }
+    // If then node is on the left side
+    if(current -> getParent() -> getLeft() == current)
+    {
+        return current -> getParent() -> getRight();
+    }
+    return NULL;
+}
+
+void del(tree* current, int value)
+{
+    tree* node = search(current, value);
+    tree* next = findNext(current);
+    // If the node is the only one in the tree
+    if(node == head && node -> getRight() == NULL && node -> getLeft() == NULL)
+    {
+        delete node;
+    }
+    
+    // If the node is the root and has one left child
+    if(node == head && node -> getLeft() != NULL && node -> getRight() == NULL)
+    {
+        tree* t = head -> getLeft();
+        head = t;
+        t -> setColor(false);
+        delete node;
+        return;
+    }
+    // If the successor has a singluar red child on the right
+    if (next -> getRight() != NULL && next -> getRight() -> getColor() == true && next -> getLeft() == NULL)
+    {
+        node -> setData(next->getData());
+        next -> getRight() -> setColor(false);
+        // If next is on the left side of parent
+        if (next -> getParent() -> getLeft() == next)
+        {
+            next -> getRight() -> setParent(next->getParent());
+            next -> getParent() -> setLeft(next -> getRight());
+            delete next;
+            return;
+        }
+        // If next is on the right side of parent
+        if (next -> getParent() -> getRight() == next)
+        {
+            next -> getRight() -> setParent(next->getParent());
+            next -> getParent() -> setRight(next -> getRight());
+            delete next;
+            return;
+        }
+    }
+    // If the successor has a singluar red child on the left
+    if (next -> getRight() == NULL && next -> getLeft() != NULL && next -> getLeft() -> getColor() == true)
+    {
+        node -> setData(next->getData());
+        next -> getLeft() -> setColor(false);
+        // If next is on the left side of parent
+        if (next -> getParent() -> getLeft() == next)
+        {
+            next -> getRight() -> setParent(next->getParent());
+            next -> getParent() -> setLeft(next -> getRight());
+            delete next;
+            return;
+        }
+        // If next is on the right side of parent
+        if (next -> getParent() -> getRight() == next)
+        {
+            next -> getRight() -> setParent(next->getParent());
+            next -> getParent() -> setRight(next -> getRight());
+            delete next;
+            return;
+        }
+    }
+    
+    // It is a node with no children and no siblings
+    if (next -> getLeft() == NULL && next -> getRight() == NULL && getSibling(next) == NULL)
+    {
+        node -> setData(next -> getData());
+        
+        // If the node is on the right side
+        if (node -> getParent() -> getRight() == node)
+        {
+            node -> getRight() -> setParent(node->getParent());
+            node -> getParent() -> setRight(node->getRight());
+            next -> setParent(NULL);
+            node -> setRight(NULL);
+            delete next;
+            return;
+        }
+        // If the node is on the left side
+        if (node -> getParent() -> getLeft() == node)
+        {
+            node -> getRight() -> setParent(node->getParent());
+            node -> getParent() -> setLeft(node->getRight());
+            next -> setParent(NULL);
+            node -> setRight(NULL);
+            delete next;
+            return;
+        }
+    }
+    if (next -> getColor() == false && next -> getRight() -> getColor() == false)
+    {
+        node -> setData(next->getData());
+        next -> getRight() -> setColor(false);
+        // If next is on the left side of parent
+        if (next -> getParent() -> getLeft() == next)
+        {
+            next -> getRight() -> setParent(next->getParent());
+            next -> getParent() -> setLeft(next -> getRight());
+            next -> setParent(NULL);
+            node -> setRight(NULL);
+            delete next;
+            return;
+        }
+        // If next is on the right side of parent
+        if (next -> getParent() -> getRight() == next)
+        {
+            next -> getRight() -> setParent(next->getParent());
+            next -> getParent() -> setRight(next -> getRight());
+            next -> setParent(NULL);
+            node -> setRight(NULL);
+            delete next;
+            return;
+        }
+    }
+}
+
+void delMethod(tree* current, int value)
+{
+    // The node that is being deleted
+    tree* node = search(current, value);
+    // The node that will take its place
+    tree* next = findNext(current);
+    
+    // If the node that is replacing is red and has no children
+    if(next->getColor() == true && next->getLeft() == NULL && next -> getRight() == NULL)
+    {
+        del(current, value);
+        return;
+    }
+    if (next -> getRight() != NULL || next -> getLeft() != NULL)
+    {
+        // If the left child of the node that is replacing is red and has no children
+        if(next -> getColor() == false && next -> getLeft() -> getColor() == true && next -> getLeft() -> getLeft() == NULL && next -> getLeft() -> getRight() == NULL)
+        {
+            del(current, value);
+            return;
+        }
+        
+        // If the right child of the node that is replacing is red and has no children
+        if(next -> getColor() == false && next -> getRight() -> getColor() == true && next -> getRight() -> getLeft() == NULL && next -> getRight() -> getRight() == NULL)
+        {
+            del(current, value);
+            return;
+        }
+    }
+    else
+    {
+        // This will be the double black node
+        tree* doubleBlack = new tree(0);
+        doubleBlack -> setColor(false);
+        doubleBlack -> setParent(next);
+        next -> setRight(doubleBlack);
+        del(current, value);
+        // Cases 1-6
+        case4(doubleBlack);
+        case6(doubleBlack);
+        
+    }
+}
+
+void case4(tree* current)
+{
+    if (current -> getParent()->getColor() == true)
+    {
+        
+        int color = 0;
+        // color checks
+        if(getSibling(current) != NULL)
+        {
+            if(getSibling(current) -> getColor() == false)
+            {
+                color++;
+            }
+        }
+        else if(getSibling(current) == NULL)
+        {
+            color++;
+        }
+        if(getSibling(current) -> getLeft() != NULL)
+        {
+            if(getSibling(current) -> getLeft() -> getColor() == false)
+            {
+                color++;
+            }
+        }
+        else if(getSibling(current) -> getLeft() == NULL)
+        {
+            color++;
+        }
+        
+        if(getSibling(current) -> getRight() != NULL)
+        {
+            if(getSibling(current) -> getRight() -> getColor() == false)
+            {
+                color++;
+            }
+        }
+        else if(getSibling(current) -> getRight() == NULL)
+        {
+            color++;
+        }
+        
+        
+        // If the parent is black and the sibling and all if its childeren are black
+        if (color == 3)
+        {
+            // Switch the color of the parent and the sibling
+            current -> getParent() -> toggle();
+            getSibling(current) -> toggle();
+            
+            // Case 4 is also terminating case so lets clean up the double black node
+            // If its on left side
+            if(current -> getParent() -> getLeft() == current)
+            {
+                current -> getParent() -> setLeft(NULL);
+                delete current;
+            }
+            // If its on  right side
+            if(current -> getParent() -> getRight() == current)
+            {
+                current -> getParent() -> setRight(NULL);
+                delete current;
+            }
+        }
+    }
+    print(head);
+}
+
+void case6(tree* current)
+{
+    int color = 0;
+    // check if node is on right and S is black and SL is red or node is left S is black and SR is right
+    // Left side
+    if(current -> getParent() -> getRight() == current)
+    {
+        if (getSibling(current) != NULL)
+        {
+            if(getSibling(current) -> getColor() == false)
+            {
+                color++;
+            }
+        }
+        if(getSibling(current) -> getLeft() != NULL)
+        {
+            if(getSibling(current) -> getLeft() -> getColor() == true)
+            {
+                color++;
+            }
+        }
+    }
+    // right side
+    if(current -> getParent() -> getLeft() == current)
+    {
+        if (getSibling(current) != NULL)
+        {
+            if(getSibling(current) -> getColor() == false)
+            {
+                color++;
+            }
+        }
+        if(getSibling(current) -> getRight() != NULL)
+        {
+            if(getSibling(current) -> getRight() -> getColor() == true)
+            {
+                color++;
+            }
+        }
+    }
+    // Color count will be two if conditions are satisfied
+    
+    if (color == 2)
+    {
+        // right side
+        if(current -> getParent() -> getRight() == current)
+        {
+            rotateFull2(head, getSibling(current) -> getLeft());
+            current -> getParent() -> setColor(false);
+            getGrandParent(current) -> setColor(false);
+            getUncle(current) -> setColor(false);
+            print(head);
+        }
+        // left side
+        if(current -> getParent() -> getLeft() == current)
+        {
+            rotateFull2(head, getSibling(current) -> getRight());
+            current -> getParent() -> toggle();
+            getGrandParent(current) -> setColor(current->getParent()->getColor());
+            current -> getParent() -> setColor(false);
+            getUncle(current) -> setColor(false);
+            print(head);
         }
     }
 }
