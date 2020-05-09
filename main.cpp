@@ -266,77 +266,76 @@ void buildTree(int value, tree* current)
         head = t;
         head ->  setColor(false);
         
-        tree* five = new tree(5);
-        five -> setColor(false);
-        tree* thirty = new tree(30);
-        thirty -> setColor(false);
-        tree* fourty = new tree(40);
-        fourty -> setColor(true);
-        tree* twentyfive = new tree(25);
-        twentyfive -> setColor(true);
-        
-        thirty -> setLeft(twentyfive);
-        twentyfive -> setParent(thirty);
-        thirty -> setRight(fourty);
-        fourty -> setParent(thirty);
-        head -> setRight(thirty);
-        thirty -> setParent(head);
-        head -> setLeft(five);
-        five -> setParent(head);
+        /* tree* five = new tree(5);
+         five -> setColor(false);
+         tree* thirty = new tree(30);
+         thirty -> setColor(false);
+         tree* fourty = new tree(40);
+         fourty -> setColor(true);
+         tree* twentyfive = new tree(25);
+         twentyfive -> setColor(true);
+         
+         thirty -> setLeft(twentyfive);
+         twentyfive -> setParent(thirty);
+         thirty -> setRight(fourty);
+         fourty -> setParent(thirty);
+         head -> setRight(thirty);
+         thirty -> setParent(head);
+         head -> setLeft(five);
+         five -> setParent(head);*/
     }
-    /*
-     
-     else // if the tree exists
-     {
-     // If the value is larger than the previous node
-     if(value > current -> getData())
-     {
-     if(current -> getRight() == NULL || current -> getRight() -> getData() == 0)
-     {
-     tree* right = new tree(value);
-     current -> setRight(right);
-     right -> setParent(current);
-     current2 = right;
-     
-     while (rotateParent(head, current2) == true || rotateFull(head, current2) == true || parentRed(head, current2) == true)
-     {
-     print(head);
-     }
-     print(head);
-     }
-     else
-     {
-     buildTree(value, current-> getRight());
-     }
-     }
-     // If the value is less than, set as left
-     else if(value < current -> getData())
-     {
-     if(current -> getLeft() == NULL || current -> getLeft() -> getData() == 0)
-     {
-     tree* left = new tree(value);
-     current -> setLeft(left);
-     left -> setParent(current);
-     current2 = left;
-     
-     while (rotateParent(head, current2) == true || rotateFull(head, current2) == true || parentRed(head, current2) == true)
-     {
-     print(head);
-     }
-     print(head);
-     
-     }
-     else
-     {
-     buildTree(value, current-> getLeft());
-     }
-     }
-     else // the value is duplicate
-     {
-     
-     }
-     }
-     */
+    
+    
+    else // if the tree exists
+    {
+        // If the value is larger than the previous node
+        if(value > current -> getData())
+        {
+            if(current -> getRight() == NULL || current -> getRight() -> getData() == 0)
+            {
+                tree* right = new tree(value);
+                current -> setRight(right);
+                right -> setParent(current);
+                current2 = right;
+                
+                while (rotateParent(head, current2) == true || rotateFull(head, current2) == true || parentRed(head, current2) == true)
+                {
+                    print(head);
+                }
+                print(head);
+            }
+            else
+            {
+                buildTree(value, current-> getRight());
+            }
+        }
+        // If the value is less than, set as left
+        else if(value < current -> getData())
+        {
+            if(current -> getLeft() == NULL || current -> getLeft() -> getData() == 0)
+            {
+                tree* left = new tree(value);
+                current -> setLeft(left);
+                left -> setParent(current);
+                current2 = left;
+                
+                while (rotateParent(head, current2) == true || rotateFull(head, current2) == true || parentRed(head, current2) == true)
+                {
+                    print(head);
+                }
+                print(head);
+                
+            }
+            else
+            {
+                buildTree(value, current-> getLeft());
+            }
+        }
+        else // the value is duplicate
+        {
+            
+        }
+    }
 }
 
 tree* getGrandParent(tree* current)
@@ -525,6 +524,7 @@ void rotateFull2(tree* root, tree* current)
         current -> getParent() -> getLeft() -> setParent(temp);
         temp -> setRight(current -> getParent() -> getLeft());
         temp -> setLeft(getUncle(current));
+        getUncle(current) -> setParent(temp);
         
         
         if(getGrandParent(current) -> getParent() == NULL)
@@ -575,6 +575,7 @@ void rotateFull2(tree* root, tree* current)
         temp-> setData(getGrandParent(current) -> getData());
         temp -> setLeft(current -> getParent() -> getRight());
         temp -> setRight(getUncle(current));
+        getUncle(current) -> setParent(temp);
         
         if(getGrandParent(current) -> getParent() == NULL)
         {
@@ -763,16 +764,17 @@ void del(tree* current, int value)
     // It is a node with no children and no siblings
     if (next -> getLeft() == NULL && next -> getRight() == NULL && getSibling(next) == NULL)
     {
-        node -> setData(next -> getData());
+        // node -> setData(next -> getData());
         
         // If the node is on the right side
         if (node -> getParent() -> getRight() == node)
         {
             node -> getRight() -> setParent(node->getParent());
             node -> getParent() -> setRight(node->getRight());
-            next -> setParent(NULL);
+            node -> setParent(NULL);
             node -> setRight(NULL);
-            delete next;
+            delete node;
+            current2 = next;
             return;
         }
         // If the node is on the left side
@@ -780,9 +782,10 @@ void del(tree* current, int value)
         {
             node -> getRight() -> setParent(node->getParent());
             node -> getParent() -> setLeft(node->getRight());
-            next -> setParent(NULL);
+            node -> setParent(NULL);
             node -> setRight(NULL);
-            delete next;
+            delete node;
+            current2 = next;
             return;
         }
     }
@@ -795,9 +798,10 @@ void del(tree* current, int value)
         {
             next -> getRight() -> setParent(next->getParent());
             next -> getParent() -> setLeft(next -> getRight());
-            next -> setParent(NULL);
+            node -> setParent(NULL);
             node -> setRight(NULL);
-            delete next;
+            delete node;
+            current2 = next;
             return;
         }
         // If next is on the right side of parent
@@ -805,9 +809,10 @@ void del(tree* current, int value)
         {
             next -> getRight() -> setParent(next->getParent());
             next -> getParent() -> setRight(next -> getRight());
-            next -> setParent(NULL);
+            node -> setParent(NULL);
             node -> setRight(NULL);
-            delete next;
+            delete node;
+            current2 = next;
             return;
         }
     }
@@ -851,8 +856,8 @@ void delMethod(tree* current, int value)
         next -> setRight(doubleBlack);
         del(current, value);
         // Cases 1-6
-        case4(doubleBlack);
-        case6(doubleBlack);
+        case4(current2);
+        case6(current2);
         
     }
 }
@@ -976,6 +981,9 @@ void case6(tree* current)
             current -> getParent() -> setColor(false);
             getGrandParent(current) -> setColor(false);
             getUncle(current) -> setColor(false);
+            // Terminating, Remove double black
+            current -> getParent() -> setRight(NULL);
+            current -> setParent(NULL);
             print(head);
         }
         // left side
@@ -986,6 +994,9 @@ void case6(tree* current)
             getGrandParent(current) -> setColor(current->getParent()->getColor());
             current -> getParent() -> setColor(false);
             getUncle(current) -> setColor(false);
+            // Terminating, Remove double black
+            current -> getParent() -> setLeft(NULL);
+            current -> setParent(NULL);
             print(head);
         }
     }
