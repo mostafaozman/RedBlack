@@ -524,7 +524,10 @@ void rotateFull2(tree* root, tree* current)
         current -> getParent() -> getLeft() -> setParent(temp);
         temp -> setRight(current -> getParent() -> getLeft());
         temp -> setLeft(getUncle(current));
-        getUncle(current) -> setParent(temp);
+        if (getUncle(current) != NULL)
+        {
+            getUncle(current) -> setParent(temp);
+        }
         
         
         if(getGrandParent(current) -> getParent() == NULL)
@@ -575,7 +578,10 @@ void rotateFull2(tree* root, tree* current)
         temp-> setData(getGrandParent(current) -> getData());
         temp -> setLeft(current -> getParent() -> getRight());
         temp -> setRight(getUncle(current));
-        getUncle(current) -> setParent(temp);
+        if (getUncle(current) != NULL)
+        {
+            getUncle(current) -> setParent(temp);
+        }
         
         if(getGrandParent(current) -> getParent() == NULL)
         {
@@ -762,15 +768,14 @@ void del(tree* current, int value)
     }
     
     // It is a node with no children and no siblings
-    if (next -> getLeft() == NULL && next -> getRight() == NULL && getSibling(next) == NULL)
+    if (next -> getLeft() == NULL && next -> getRight() == NULL)
     {
         // node -> setData(next -> getData());
         
         // If the node is on the right side
         if (node -> getParent() -> getRight() == node)
         {
-            node -> getRight() -> setParent(node->getParent());
-            node -> getParent() -> setRight(node->getRight());
+            node -> getParent() -> setRight(NULL);
             node -> setParent(NULL);
             node -> setRight(NULL);
             delete node;
@@ -780,8 +785,7 @@ void del(tree* current, int value)
         // If the node is on the left side
         if (node -> getParent() -> getLeft() == node)
         {
-            node -> getRight() -> setParent(node->getParent());
-            node -> getParent() -> setLeft(node->getRight());
+            node -> getParent() -> setLeft(NULL);
             node -> setParent(NULL);
             node -> setRight(NULL);
             delete node;
