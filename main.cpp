@@ -29,6 +29,11 @@ void delMethod(tree* current, int value);
 tree* getSibling(tree* current);
 void case4(tree* current);
 void case6(tree* current);
+void case3(tree* current);
+void case1(tree* current);
+void case5(tree* current);
+void case6(tree* current);
+void case2(tree* current);
 
 int heap[100];
 int size;
@@ -265,24 +270,49 @@ void buildTree(int value, tree* current)
         tree* t = new tree(value);
         head = t;
         head ->  setColor(false);
-        
-        /* tree* five = new tree(5);
+        /*
+         // left sub tree
+         tree* five = new tree(5);
          five -> setColor(false);
-         tree* thirty = new tree(30);
-         thirty -> setColor(false);
-         tree* fourty = new tree(40);
-         fourty -> setColor(true);
-         tree* twentyfive = new tree(25);
-         twentyfive -> setColor(true);
+         tree* three = new tree(3);
+         three -> setColor(false);
+         tree* two = new tree(2);
+         two -> setColor(false);
          
-         thirty -> setLeft(twentyfive);
-         twentyfive -> setParent(thirty);
+         five -> setRight(three);
+         three -> setParent(five);
+         five -> setLeft(two);
+         two -> setParent(five);
+         
+         // right sub tree
+         tree* fifty = new tree(50);
+         fifty -> setColor(false);
+         tree* seventy = new tree(70);
+         seventy -> setColor(false);
+         tree* thirty = new tree(30);
+         thirty -> setColor(true);
+         tree* fifteen = new tree(15);
+         fifteen -> setColor(false);
+         tree* fourty = new tree(40);
+         fourty -> setColor(false);
+         
+         thirty -> setLeft(fifteen);
+         fifteen -> setParent(thirty);
          thirty -> setRight(fourty);
          fourty -> setParent(thirty);
-         head -> setRight(thirty);
-         thirty -> setParent(head);
+         
+         fifty -> setLeft(thirty);
+         thirty -> setParent(fifty);
+         fifty -> setRight(seventy);
+         seventy -> setParent(fifty);
+         
+         // full tree
          head -> setLeft(five);
-         five -> setParent(head);*/
+         five -> setParent(head);
+         head -> setRight(fifty);
+         fifty -> setParent(head);
+         */
+        
     }
     
     
@@ -636,7 +666,7 @@ tree* search (tree* current, int value)
         return NULL;
     }
     
-    else if (value > current->getData())
+    else if (value > current->getData() || value >= current->getRight()->getData())
     {
         if(current->getRight() == NULL)
         {
@@ -650,7 +680,8 @@ tree* search (tree* current, int value)
             }
         }
     }
-    else if (value < current -> getData())
+    // go left
+    else if (value < current -> getData() || value <= current->getRight()->getData())
     {
         if (current-> getLeft() == NULL)
         {
@@ -775,7 +806,11 @@ void del(tree* current, int value)
         // If the node is on the right side
         if (node -> getParent() -> getRight() == node)
         {
-            node -> getParent() -> setRight(NULL);
+            node -> getParent() -> setRight(node -> getRight());
+            if(node -> getRight() != NULL)
+            {
+                node -> getRight() -> setParent(node->getParent());
+            }
             node -> setParent(NULL);
             node -> setRight(NULL);
             delete node;
@@ -785,7 +820,11 @@ void del(tree* current, int value)
         // If the node is on the left side
         if (node -> getParent() -> getLeft() == node)
         {
-            node -> getParent() -> setLeft(NULL);
+            node -> getParent() -> setLeft(node -> getRight());
+            if(node -> getRight() != NULL)
+            {
+                node -> getRight() -> setParent(node->getParent());
+            }
             node -> setParent(NULL);
             node -> setRight(NULL);
             delete node;
@@ -860,6 +899,8 @@ void delMethod(tree* current, int value)
         next -> setRight(doubleBlack);
         del(current, value);
         // Cases 1-6
+        case1(current2);
+        case3(current2);
         case4(current2);
         case6(current2);
         
@@ -868,66 +909,69 @@ void delMethod(tree* current, int value)
 
 void case4(tree* current)
 {
-    if (current -> getParent()->getColor() == true)
+    if (current -> getParent() != NULL)
     {
-        
-        int color = 0;
-        // color checks
-        if(getSibling(current) != NULL)
+        if (current -> getParent()->getColor() == true)
         {
-            if(getSibling(current) -> getColor() == false)
-            {
-                color++;
-            }
-        }
-        else if(getSibling(current) == NULL)
-        {
-            color++;
-        }
-        if(getSibling(current) -> getLeft() != NULL)
-        {
-            if(getSibling(current) -> getLeft() -> getColor() == false)
-            {
-                color++;
-            }
-        }
-        else if(getSibling(current) -> getLeft() == NULL)
-        {
-            color++;
-        }
-        
-        if(getSibling(current) -> getRight() != NULL)
-        {
-            if(getSibling(current) -> getRight() -> getColor() == false)
-            {
-                color++;
-            }
-        }
-        else if(getSibling(current) -> getRight() == NULL)
-        {
-            color++;
-        }
-        
-        
-        // If the parent is black and the sibling and all if its childeren are black
-        if (color == 3)
-        {
-            // Switch the color of the parent and the sibling
-            current -> getParent() -> toggle();
-            getSibling(current) -> toggle();
             
-            // Case 4 is also terminating case so lets clean up the double black node
-            // If its on left side
-            if(current -> getParent() -> getLeft() == current)
+            int color = 0;
+            // color checks
+            if(getSibling(current) != NULL)
             {
-                current -> getParent() -> setLeft(NULL);
-                delete current;
+                if(getSibling(current) -> getColor() == false)
+                {
+                    color++;
+                }
             }
-            // If its on  right side
-            if(current -> getParent() -> getRight() == current)
+            else if(getSibling(current) == NULL)
             {
-                current -> getParent() -> setRight(NULL);
-                delete current;
+                color++;
+            }
+            if(getSibling(current) -> getLeft() != NULL)
+            {
+                if(getSibling(current) -> getLeft() -> getColor() == false)
+                {
+                    color++;
+                }
+            }
+            else if(getSibling(current) -> getLeft() == NULL)
+            {
+                color++;
+            }
+            
+            if(getSibling(current) -> getRight() != NULL)
+            {
+                if(getSibling(current) -> getRight() -> getColor() == false)
+                {
+                    color++;
+                }
+            }
+            else if(getSibling(current) -> getRight() == NULL)
+            {
+                color++;
+            }
+            
+            
+            // If the parent is black and the sibling and all if its childeren are black
+            if (color == 3)
+            {
+                // Switch the color of the parent and the sibling
+                current -> getParent() -> toggle();
+                getSibling(current) -> toggle();
+                
+                // Case 4 is also terminating case so lets clean up the double black node
+                // If its on left side
+                if(current -> getParent() -> getLeft() == current)
+                {
+                    current -> getParent() -> setLeft(NULL);
+                    delete current;
+                }
+                // If its on  right side
+                if(current -> getParent() -> getRight() == current)
+                {
+                    current -> getParent() -> setRight(NULL);
+                    delete current;
+                }
             }
         }
     }
@@ -937,40 +981,43 @@ void case4(tree* current)
 void case6(tree* current)
 {
     int color = 0;
-    // check if node is on right and S is black and SL is red or node is left S is black and SR is right
+    // check if node is on right and S is black and SL is red or node is left S is black and SR is red
     // Left side
-    if(current -> getParent() -> getRight() == current)
+    if (current -> getParent() != NULL)
     {
-        if (getSibling(current) != NULL)
+        if(current -> getParent() -> getRight() == current)
         {
-            if(getSibling(current) -> getColor() == false)
+            if (getSibling(current) != NULL)
             {
-                color++;
+                if(getSibling(current) -> getColor() == false)
+                {
+                    color++;
+                }
+            }
+            if(getSibling(current) -> getLeft() != NULL)
+            {
+                if(getSibling(current) -> getLeft() -> getColor() == true)
+                {
+                    color++;
+                }
             }
         }
-        if(getSibling(current) -> getLeft() != NULL)
+        // right side
+        if(current -> getParent() -> getLeft() == current)
         {
-            if(getSibling(current) -> getLeft() -> getColor() == true)
+            if (getSibling(current) != NULL)
             {
-                color++;
+                if(getSibling(current) -> getColor() == false)
+                {
+                    color++;
+                }
             }
-        }
-    }
-    // right side
-    if(current -> getParent() -> getLeft() == current)
-    {
-        if (getSibling(current) != NULL)
-        {
-            if(getSibling(current) -> getColor() == false)
+            if(getSibling(current) -> getRight() != NULL)
             {
-                color++;
-            }
-        }
-        if(getSibling(current) -> getRight() != NULL)
-        {
-            if(getSibling(current) -> getRight() -> getColor() == true)
-            {
-                color++;
+                if(getSibling(current) -> getRight() -> getColor() == true)
+                {
+                    color++;
+                }
             }
         }
     }
@@ -986,8 +1033,11 @@ void case6(tree* current)
             getGrandParent(current) -> setColor(false);
             getUncle(current) -> setColor(false);
             // Terminating, Remove double black
-            current -> getParent() -> setRight(NULL);
-            current -> setParent(NULL);
+            if (current -> getData() == 0)
+            {
+                current -> getParent() -> setRight(NULL);
+                current -> setParent(NULL);
+            }
             print(head);
         }
         // left side
@@ -999,9 +1049,167 @@ void case6(tree* current)
             current -> getParent() -> setColor(false);
             getUncle(current) -> setColor(false);
             // Terminating, Remove double black
-            current -> getParent() -> setLeft(NULL);
-            current -> setParent(NULL);
+            if (current -> getData() == 0)
+            {
+                current -> getParent() -> setLeft(NULL);
+                current -> setParent(NULL);
+            }
             print(head);
         }
+    }
+}
+
+void case3(tree* current)
+{
+    int color = 0;
+    // Check if parent is black, sibling is black, and sibling children are black
+    // Sibling has to exist
+    if (current -> getParent() != NULL)
+    {
+        if (current -> getParent() -> getColor() == false)
+        {
+            color++;
+        }
+        if (getSibling(current) != NULL)
+        {
+            if(getSibling(current) -> getColor() == false)
+            {
+                color++;
+            }
+            if(getSibling(current) -> getLeft() == NULL)
+            {
+                color++;
+            }
+            if(getSibling(current) -> getRight() == NULL)
+            {
+                color++;
+            }
+            if(getSibling(current) -> getRight() != NULL)
+            {
+                if(getSibling(current) -> getRight() -> getColor() == false)
+                {
+                    color++;
+                }
+            }
+            if(getSibling(current) -> getLeft() != NULL)
+            {
+                if(getSibling(current) -> getLeft() -> getColor() == false)
+                {
+                    color++;
+                }
+            }
+        }
+    }
+    // Color count should be 4 to proceed
+    if (color == 4)
+    {
+        getSibling(current) -> toggle();
+        current2 = current -> getParent();
+        
+        //Remove double black
+        // Left side
+        if (current -> getParent() -> getLeft() == current && current -> getData() == 0)
+        {
+            current -> getParent() -> setLeft(NULL);
+            current -> setParent(NULL);
+        }
+        // Right Side
+        else if (current -> getData() == 0)
+        {
+            current -> getParent() -> setRight(NULL);
+            current -> setParent(NULL);
+        }
+        
+        // call all other cases from here
+        case1(current2);
+        // case2(current2);
+        case3(current2);
+        case4(current2);
+        case5(current2);
+        case6(current2);
+    }
+}
+
+void case5(tree* current)
+{
+    // Check if parent is black, sibling is black. Then if doubleblack is right to parent, check if SR is red. If doubleblack is left, check if SL is red
+    int color = 0;
+    // color count should be 3
+    if (current  -> getParent() != NULL)
+    {
+        if (current -> getParent()-> getColor() == false)
+        {
+            color++;
+        }
+        if (getSibling(current)-> getColor() == false)
+        {
+            color++;
+        }
+        // Node is on right of parent, check if SR is red
+        if (current-> getParent() -> getRight() == current)
+        {
+            if (getSibling(current) -> getRight() != NULL)
+            {
+                if(getSibling(current) -> getRight() -> getColor() == true)
+                {
+                    color++;
+                }
+            }
+        }
+        // Node is on left of parent, check if SL is red
+        if (current-> getParent() -> getLeft() == current)
+        {
+            if (getSibling(current) -> getLeft() != NULL)
+            {
+                if(getSibling(current) -> getLeft() -> getColor() == true)
+                {
+                    color++;
+                }
+            }
+        }
+    }
+    
+    if (color == 3)
+    {
+        // If conditions are satisfied we will do a tree rotation with respect to the siblings child
+        if (current -> getParent() -> getLeft() == current)
+        {
+            current2 = getSibling(current) -> getLeft();
+            current2 -> getParent() -> toggle();
+            rotateParent(head, current2);
+            current2 -> getParent() -> toggle();
+            print(head);
+        }
+        if (current -> getParent() -> getRight() == current)
+        {
+            current2 = getSibling(current) -> getRight();
+            current2 -> getParent() -> toggle();
+            rotateParent(head, current2);
+            current2 -> getParent() -> toggle();
+            print(head);
+        }
+        
+        // not a terminating case so we will have to call case 6
+        case6(current);
+        
+    }
+    
+}
+
+void case2(tree* current)
+{
+    
+}
+
+void case1(tree* current)
+{
+    if (current == head && current -> getColor() == false)
+    {
+        // do nothing
+    }
+    if (current == head && current -> getColor() == true)
+    {
+        // make black
+        current -> toggle();
     }
 }
