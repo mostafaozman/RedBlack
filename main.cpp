@@ -673,7 +673,7 @@ tree* search (tree* current, int value)
         return NULL;
     }
     
-    else if (value > current->getData() || value >= current->getRight()->getData())
+    else if (value > current->getData())
     {
         if(current->getRight() == NULL)
         {
@@ -688,7 +688,7 @@ tree* search (tree* current, int value)
         }
     }
     // go left
-    else if (value < current -> getData() || value <= current->getRight()->getData())
+    else if (value < current -> getData())
     {
         if (current-> getLeft() == NULL)
         {
@@ -745,11 +745,6 @@ void del(tree* current, int value)
 {
     tree* node = search(current, value);
     tree* next = findNext(current);
-    // If the node is the only one in the tree
-    if(node == head && node -> getRight() == NULL && node -> getLeft() == NULL)
-    {
-        delete node;
-    }
     
     // If the node is the root and has one left child
     if(node == head && node -> getLeft() != NULL && node -> getRight() == NULL)
@@ -763,21 +758,13 @@ void del(tree* current, int value)
     // If the successor has a singluar red child on the right
     if (next -> getRight() != NULL && next -> getRight() -> getColor() == true && next -> getLeft() == NULL)
     {
+        next = node -> getRight();
         node -> setData(next->getData());
-        next -> getRight() -> setColor(false);
-        // If next is on the left side of parent
-        if (next -> getParent() -> getLeft() == next)
+        // If node is on the right side of parent
+        if (node -> getParent() -> getRight() == node)
         {
-            next -> getRight() -> setParent(next->getParent());
-            next -> getParent() -> setLeft(next -> getRight());
-            delete next;
-            return;
-        }
-        // If next is on the right side of parent
-        if (next -> getParent() -> getRight() == next)
-        {
-            next -> getRight() -> setParent(next->getParent());
-            next -> getParent() -> setRight(next -> getRight());
+            node -> getRight() -> setParent(node->getParent());
+            node -> getParent() -> setRight(node -> getRight());
             delete next;
             return;
         }
@@ -785,21 +772,13 @@ void del(tree* current, int value)
     // If the successor has a singluar red child on the left
     if (next -> getRight() == NULL && next -> getLeft() != NULL && next -> getLeft() -> getColor() == true)
     {
+        next = node -> getLeft();
         node -> setData(next->getData());
-        next -> getLeft() -> setColor(false);
-        // If next is on the left side of parent
-        if (next -> getParent() -> getLeft() == next)
+        // If node is on the left side of parent
+        if (node -> getParent() -> getLeft() == next)
         {
-            next -> getRight() -> setParent(next->getParent());
-            next -> getParent() -> setLeft(next -> getRight());
-            delete next;
-            return;
-        }
-        // If next is on the right side of parent
-        if (next -> getParent() -> getRight() == next)
-        {
-            next -> getRight() -> setParent(next->getParent());
-            next -> getParent() -> setRight(next -> getRight());
+            node -> getRight() -> setParent(node->getParent());
+            node -> getParent() -> setLeft(node -> getLeft());
             delete next;
             return;
         }
@@ -818,10 +797,13 @@ void del(tree* current, int value)
             {
                 node -> getRight() -> setParent(node->getParent());
             }
+            // deleting tree with a root and one child
+            if (node -> getParent() == head && getSibling(node) == NULL)
+            {
+                current2 = head;
+            }
             node -> setParent(NULL);
             node -> setRight(NULL);
-            delete node;
-            current2 = next;
             return;
         }
         // If the node is on the left side
@@ -834,7 +816,6 @@ void del(tree* current, int value)
             }
             node -> setParent(NULL);
             node -> setRight(NULL);
-            delete node;
             current2 = next -> getRight();
             return;
         }
@@ -859,10 +840,10 @@ void del(tree* current, int value)
         {
             next -> getRight() -> setParent(next->getParent());
             next -> getParent() -> setRight(next -> getRight());
+            current2 = next -> getRight();
             next -> setParent(NULL);
             next -> setRight(NULL);
             delete node;
-            current2 = next;
             return;
         }
     }
@@ -874,6 +855,29 @@ void delMethod(tree* current, int value)
     tree* node = search(current, value);
     // The node that will take its place
     tree* next = findNext(current);
+    
+    // If the node is the only one in the tree
+    if(node == head && node -> getLeft() == NULL)
+    {
+        if (node -> getRight() != NULL)
+        {
+            if (node -> getRight() -> getData() == 0)
+            {
+                head -> setLeft(NULL);
+                head -> getRight() -> setParent(NULL);
+                head -> setRight(NULL);
+                head = NULL;
+                delete node;
+            }
+        }
+        
+        if (node -> getRight() == NULL)
+        {
+            head = NULL;
+            return;
+        }
+        
+    }
     
     // If the node that is replacing is red and has no children
     if(next->getColor() == true && next->getLeft() == NULL && next -> getRight() == NULL)
@@ -890,7 +894,7 @@ void delMethod(tree* current, int value)
             return;
         }
     }
-    if( next -> getRight() != NULL)
+    if(next -> getRight() != NULL)
     {
         // If the right child of the node that is replacing is red and has no children
         if(next -> getColor() == false && next -> getRight() -> getColor() == true && next -> getRight() -> getLeft() == NULL && next -> getRight() -> getRight() == NULL)
@@ -1041,20 +1045,20 @@ bool case6(tree* current)
     int color = 0;
     // check if node is on right and S is black and SL is red or node is left S is black and SR is red
     // Left side
-    if (current -> getRight() != NULL)
-    {
-        if (current -> getRight() -> getColor() == true)
-        {
-            return false;
-        }
-    }
-    if (current -> getLeft() != NULL)
-    {
-        if (current -> getLeft() -> getColor() == true)
-        {
-            return false;
-        }
-    }
+    /* if (current -> getRight() != NULL)
+     {
+     if (current -> getRight() -> getColor() == true)
+     {
+     return false;
+     }
+     }
+     if (current -> getLeft() != NULL)
+     {
+     if (current -> getLeft() -> getColor() == true)
+     {
+     return false;
+     }
+     }*/
     if (current -> getColor() == false)
     {
         color ++;
