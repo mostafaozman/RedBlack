@@ -34,6 +34,7 @@ bool case1(tree* current);
 bool case5(tree* current);
 bool case6(tree* current);
 bool case2(tree* current);
+void cases(tree* current);
 
 int heap[100];
 int size;
@@ -760,12 +761,14 @@ void del(tree* current, int value)
     {
         next = node -> getRight();
         node -> setData(next->getData());
-        // If node is on the right side of parent
-        if (node -> getParent() -> getRight() == node)
+        node -> setColor(next->getColor());
+        // If next is on the right side of node
+        if (node -> getLeft() == next)
         {
-            node -> getRight() -> setParent(node->getParent());
-            node -> getParent() -> setRight(node -> getRight());
+            next -> setParent(NULL);
+            node -> setRight(NULL);
             delete next;
+            current2 = node;
             return;
         }
     }
@@ -774,12 +777,14 @@ void del(tree* current, int value)
     {
         next = node -> getLeft();
         node -> setData(next->getData());
-        // If node is on the left side of parent
-        if (node -> getParent() -> getLeft() == next)
+        node -> setColor(next-> getColor());
+        // If next is on the left side of node
+        if (node -> getLeft() == next)
         {
-            node -> getRight() -> setParent(node->getParent());
-            node -> getParent() -> setLeft(node -> getLeft());
+            next -> setParent(NULL);
+            node -> setLeft(NULL);
             delete next;
+            current2 = node;
             return;
         }
     }
@@ -802,6 +807,7 @@ void del(tree* current, int value)
             {
                 current2 = head;
             }
+            current2 = node -> getRight();
             node -> setParent(NULL);
             node -> setRight(NULL);
             return;
@@ -883,6 +889,7 @@ void delMethod(tree* current, int value)
     if(next->getColor() == true && next->getLeft() == NULL && next -> getRight() == NULL)
     {
         del(current, value);
+        cases(current2);
         return;
     }
     if (next -> getLeft() != NULL)
@@ -891,6 +898,7 @@ void delMethod(tree* current, int value)
         if(next -> getColor() == false && next -> getLeft() -> getColor() == true && next -> getLeft() -> getLeft() == NULL && next -> getLeft() -> getRight() == NULL)
         {
             del(current, value);
+            cases(current2);
             return;
         }
     }
@@ -900,6 +908,7 @@ void delMethod(tree* current, int value)
         if(next -> getColor() == false && next -> getRight() -> getColor() == true && next -> getRight() -> getLeft() == NULL && next -> getRight() -> getRight() == NULL)
         {
             del(current, value);
+            cases(current2);
             return;
         }
     }
@@ -912,11 +921,9 @@ void delMethod(tree* current, int value)
         doubleBlack -> setParent(next);
         next -> setRight(doubleBlack);
         del(current, value);
-        // Cases 1-6
-        while (case1(current2) || case2(current2) || case3(current2) || case4(current2) || case5(current2) || case6(current2) == true)
-        {
-            print(head);
-        }
+        
+        // cases 1-6
+        cases(current2);
         
         current2 = search(head, 0);
         // getting rid of double black
@@ -1110,8 +1117,9 @@ bool case6(tree* current)
         {
             rotateFull2(head, getSibling(current) -> getLeft());
             current -> getParent() -> setColor(false);
-            getGrandParent(current) -> setColor(false);
+            getGrandParent(current) -> setColor(true);
             getUncle(current) -> setColor(false);
+            current2 = current -> getParent();
             // Terminating, Remove double black
             if (current -> getData() == 0)
             {
@@ -1119,15 +1127,16 @@ bool case6(tree* current)
                 current -> setParent(NULL);
             }
             print(head);
+            return true;
         }
         // left side
         if(current -> getParent() -> getLeft() == current)
         {
             rotateFull2(head, getSibling(current) -> getRight());
-            current -> getParent() -> toggle();
-            getGrandParent(current) -> setColor(current->getParent()->getColor());
             current -> getParent() -> setColor(false);
+            getGrandParent(current) -> setColor(true);
             getUncle(current) -> setColor(false);
+            current2 = current -> getParent();
             // Terminating, Remove double black
             if (current -> getData() == 0)
             {
@@ -1135,7 +1144,7 @@ bool case6(tree* current)
                 current -> setParent(NULL);
             }
             print(head);
-            
+            return true;
         }
         return true;
     }
@@ -1149,24 +1158,20 @@ bool case3(tree* current)
     // Sibling has to exist
     if (current -> getParent() != NULL)
     {
-        if (current -> getColor() == false)
-        {
-            color ++;
-        }
-        if (current -> getRight() != NULL)
-        {
-            if (current -> getRight() -> getColor() == true)
-            {
-                return false;
-            }
-        }
-        if (current -> getLeft() != NULL)
-        {
-            if (current -> getLeft() -> getColor() == true)
-            {
-                return false;
-            }
-        }
+        /*if (current -> getRight() != NULL)
+         {
+         if (current -> getRight() -> getColor() == true)
+         {
+         return false;
+         }
+         }*/
+        /*if (current -> getLeft() != NULL)
+         {
+         if (current -> getLeft() -> getColor() == true)
+         {
+         return false;
+         }
+         }*/
         if (current -> getParent() -> getColor() == false)
         {
             color++;
@@ -1201,8 +1206,8 @@ bool case3(tree* current)
             }
         }
     }
-    // Color count should be 5 to proceed
-    if (color == 5)
+    // Color count should be 4 to proceed
+    if (color == 4)
     {
         getSibling(current) -> toggle();
         current2 = current -> getParent();
@@ -1404,4 +1409,13 @@ bool case1(tree* current)
         return true;
     }
     return false;
+}
+
+void cases(tree* current)
+{
+    // Cases 1-6
+    while (case1(current2) || case2(current2) || case3(current2) || case4(current2) || case5(current2) || case6(current2) == true)
+    {
+        print(head);
+    }
 }
