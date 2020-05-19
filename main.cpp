@@ -759,34 +759,42 @@ void del(tree* current, int value)
     // If the successor has a singluar red child on the right
     if (next -> getRight() != NULL && next -> getRight() -> getColor() == true && next -> getLeft() == NULL)
     {
-        next = node -> getRight();
-        node -> setData(next->getData());
-        node -> setColor(next->getColor());
-        // If next is on the right side of node
-        if (node -> getLeft() == next)
+        
+        node -> setData(next -> getData());
+        node -> setColor(next -> getColor());
+        
+        next -> getRight() -> setParent(next -> getParent());
+        if (next -> getParent() -> getRight() == next)
         {
-            next -> setParent(NULL);
-            node -> setRight(NULL);
-            delete next;
-            current2 = node;
-            return;
+            next -> getParent() -> setRight(next -> getRight());
         }
+        if (next -> getParent() -> getLeft() == next)
+        {
+            next -> getParent() -> setLeft(next -> getRight());
+        }
+        current2 = next -> getRight();
+        
+        return;
+        
     }
     // If the successor has a singluar red child on the left
     if (next -> getRight() == NULL && next -> getLeft() != NULL && next -> getLeft() -> getColor() == true)
     {
-        next = node -> getLeft();
-        node -> setData(next->getData());
-        node -> setColor(next-> getColor());
-        // If next is on the left side of node
-        if (node -> getLeft() == next)
+        node -> setData(next -> getData());
+        node -> setColor(next -> getColor());
+        
+        next -> getLeft() -> setParent(next -> getParent());
+        if (next -> getParent() -> getRight() == next)
         {
-            next -> setParent(NULL);
-            node -> setLeft(NULL);
-            delete next;
-            current2 = node;
-            return;
+            next -> getParent() -> setRight(next -> getLeft());
         }
+        if (next -> getParent() -> getLeft() == next)
+        {
+            next -> getParent() -> setLeft(next -> getLeft());
+        }
+        current2 = next -> getLeft();
+        
+        return;
     }
     
     // It is a node with no children and no siblings
